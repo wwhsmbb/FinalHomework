@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>员工考勤管理</title>
+<meta name="keywords" content="员工考勤管理">
+<meta name="description" content="员工考勤管理">
+<base th:href="${#request.getContextPath()}+'/'">
+<link rel="shortcut icon" th:href="@{favicon.ico}" href="favicon.ico">
+
+<link rel="stylesheet" th:href="@{/res/css/login.css}"
+	href="/res/css/login.css" />
+<link th:href="@{/css/bootstrap.min.css?v=3.3.5}"
+	href="css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+<link th:href="@{/css/font-awesome.min.css?v=4.4.0}"
+	href="css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+<link th:href="@{/css/plugins/bootstrap-table/bootstrap-table.min.css}"
+	href="css/plugins/bootstrap-table/bootstrap-table.min.css"
+	rel="stylesheet">
+<link th:href="@{/css/animate.min.css}" href="css/animate.min.css"
+	rel="stylesheet">
+<link th:href="@{/css/style.min.css?v=4.0.0}"
+	href="css/style.min.css?v=4.0.0" rel="stylesheet">
+<link th:href="@{/css/plugins/sweetalert/sweetalert.css}"
+	href="/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+<link th:href="@{/css/plugins/bootstrap-select/bootstrap-select.min.css}"
+	href="/css/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<script type="text/javascript" th:src="@{/js/jquery-1.4.4.min.js}"></script>
+		<input type="hidden" id="ltdId" th:value="${LTD_ID}">
+		<input type="hidden" id="ltdName" th:value="${LTD_NAME}">
+		<div class="wrapper wrapper-content animated fadeInRight">
+		<div class="ibox float-e-margins">
+			<div class="ibox-content">
+				<div class="row row-lg">
+					<!-- 搜索列表框 -->
+					<div class="col-sm-12">
+						<!-- Example Pagination -->
+						<div class="example-wrap">
+							<h4 class="example-title">员工考勤列表</h4>
+							<div class="example">
+								<div class="btn-group hidden-xs" id="toolbar" role="group">
+									<div class="pull-left" id="query-form" >
+										<input id="presentDate" name="presentDate" type="date" style="float: left; width: 200px;height:30px; margin-right: 5px;"class="form-control" placeholder="按日期查询" >
+										<div class="btn-group">
+											<button id="btn_search" onclick="customSearch()"
+												type="button" class="btn btn-info">
+												<span class="fa fa-search" aria-hidden="true"></span>
+											</button>
+										</div>
+									</div>
+									<div class="pull-left" style="margin-left:2px;">
+										<button type="button" class="btn btn-danger" onclick="empty()">
+											<span>清空查询字段内容</span>
+										</button>
+									</div>
+									<div class="pull-right" style="margin-left:570px;">
+										<button type="button" id="singIn"  class="btn btn-info" onclick="attendance()">
+											<span>签到 / 签退</span>
+										</button>									
+									</div>
+								</div>
+								<table id="table_server"></table>
+							</div>
+						</div>
+					</div>
+		<!-- End Panel Other -->
+			</div>
+		</div>
+	</div>
+	</div>
+	<script src="/js/jquery.min.js?v=2.1.4"
+		th:src="@{/js/jquery.min.js?v=2.1.4}"></script>
+	<script src="/js/bootstrap.min.js?v=3.3.5"
+		th:src="@{/js/bootstrap.min.js?v=3.3.5}"></script>
+	<script src="/js/content.min.js?v=1.0.0"
+		th:src="@{/js/content.min.js?v=1.0.0}"></script>
+	<script src="/js/plugins/bootstrap-table/bootstrap-table.min.js"
+		th:src="@{/js/plugins/bootstrap-table/bootstrap-table.min.js}"></script>
+	<script src="/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"
+		th:src="@{/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js}"></script>
+	<script
+		src="/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"
+		th:src="@{/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js}"></script>
+	<script src="/js/app.js" th:src="@{/js/app.js}"></script>
+	<script src="/js/plugins/sweetalert/sweetalert.min.js"
+		th:src="@{/js/plugins/sweetalert/sweetalert.min.js}"></script>
+	<script src="/js/baisee/data.delete.js" th:src="@{/js/baisee/data.delete.js}"></script>
+	<script src="/js/plugins/bootstrap-select/bootstrap-select.min.js" th:src="@{/js/plugins/bootstrap-select/bootstrap-select.min.js}"></script>
+	
+	<script th:inline="javascript">
+	$(function() {
+		var timestamp = Date.parse(new Date());
+		var t = $("#table_server").bootstrapTable({
+			url : 'attendance/employeePage',
+			dataField : 'list',
+			method : 'POST',
+			contentType : "application/x-www-form-urlencoded",
+			dataType : "json",
+			striped : true,//设置为 true 会有隔行变色效果
+			undefinedText : "空",//当数据为 undefined 时显示的字符
+			pagination : true, //分页
+			// paginationLoop:true,//设置为 true 启用分页条无限循环的功能。
+			showToggle : "true",//是否显示 切换试图（table/card）按钮
+			showColumns : "true",//是否显示 内容列下拉框
+			pageNumber : 1,//如果设置了分页，首页页码
+			// showPaginationSwitch:true,//是否显示 数据条数选择框
+			pageSize : 5,//如果设置了分页，页面数据条数
+			pageList : [ 5, 10, 20, 40 ], //如果设置了分页，设置可供选择的页面数据条数。设置为All 则显示所有记录。
+			paginationPreText : '‹',//指定分页条中上一页按钮的图标或文字,这里是<
+    		paginationNextText: '›',//指定分页条中下一页按钮的图标或文字,这里是>
+			// singleSelect: false,//设置True 将禁止多选
+			search : false, //显示搜索框
+			toolbar : "#toolbar",//工具栏
+			data_local : "zh-US",//表格汉化
+			sidePagination : "server", //服务端处理分页
+			queryParams : function(params) {//自定义参数，这里的参数是传给后台的，我这是是分页用的
+				var param = {};
+				$('#query-form').find('[name]').each(function() {
+					var value = $(this).val();
+					if (value != '') {
+						param[$(this).attr('name')] = value;
+					}
+				});
+			    param['pageNum'] = this.pageNumber;  
+				param['pageSize'] = this.pageSize;   //页面大小
+			    param['limit'] = this.limit; 
+			    param['offset'] = this.offset; 
+				//页码
+				return param;
+			},
+			idField : "employeeSno",//指定主键列
+			columns : [ {
+				checkbox : "true",
+				field : "box"
+			},{
+				title : '员工工号',
+				field : 'employeeSno',
+				align : 'center'
+			}, {
+				title : '姓名',
+				field : 'employeeName',
+				align : 'center'
+			},{
+				title : '日期',
+				field : 'presentDate',
+				align : 'center'
+			},{
+				title : '上班签到时间',
+				field : 'checkIn',
+				align : 'center',
+				
+			},{
+				title : '下班签到时间',
+				field : 'checkOut',
+				align : 'center',
+				
+			},{
+				title : '迟到',
+				field : 'strArriveLate',
+				align : 'center',
+				
+			},{
+				title : '早退',
+				field : 'strLeaveEarly',
+				align : 'center',
+				
+			},{
+				title : '旷工半天',
+				field : 'strHalfAbsenteeism',
+				align : 'center',
+				
+			},{
+				title : '旷工一天',
+				field : 'strAbsenteeism',
+				align : 'center',
+				
+			}]
+		});
+	});
+	
+	function customSearch(text) {
+		 $("#table_server").bootstrapTable('refresh');//刷新Table，Bootstrap Table 会自动执行重新查询
+	}
+	
+	function empty(){
+		$("#presentDate").val("");
+		$("#table_server").bootstrapTable('refresh');//刷新Table，Bootstrap Table 会自动执行重新查询
+	}
+	function attendance(){
+		$.ajax({
+			url : "attendance/attendance",
+			dataType : "json",
+			traditional : true,//属性在这里设置
+			method : "post",
+			success : function(data) {
+				swal(data.result,data.msg,data.hint);
+				$("#table_server").bootstrapTable("refresh");
+			}
+		});
+	}
+	</script>
+</body>
+</html>

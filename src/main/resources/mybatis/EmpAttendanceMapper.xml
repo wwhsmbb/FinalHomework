@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.conference.mapper.EmpAttendanceMapper">
+
+	<!-- 查询所有的考勤信息 -->
+	<select id="queryListAttendance" resultType="EmpAttendance" parameterType="map">
+		select * from emp_attendance
+		<where>
+			<if test="parameter != null and parameter != ''">
+				and (
+					<!-- 名称 -->
+					 employee_name  like "%"#{parameter}"%" 
+					<!-- 工号 -->
+				 or  employee_sno   like "%"#{parameter}"%"
+				 )
+			</if>
+			<if test="presentDate != null and presentDate != ''">
+				and present_date like "%"#{presentDate}"%"
+			</if>
+		</where>
+	</select>
+	
+	<!-- 查询某个员工的考勤信息 -->
+	<select id="queryAttendanceBySno" resultType="EmpAttendance" parameterType="map">
+		select * from emp_attendance where employee_sno =#{employeeSno}
+		<if test="presentDate != null and presentDate != ''">
+			and present_date like "%"#{presentDate}"%"
+		</if>
+	</select>
+	
+	<!-- 签到 -->
+	<insert id="signIn" parameterType="EmpAttendance">
+		insert into emp_attendance
+		<trim prefix="("  suffixOverrides="," suffix=")">
+			<if test="employeeSno != null and employeeSno != ''">
+				employee_sno,
+			</if>
+			<if test="employeeName != null and employeeName != ''">
+				employee_name,
+			</if>
+			<if test="presentDate != null and presentDate != ''">
+				present_date,
+			</if>
+			<if test="checkIn != null and checkIn != ''">
+				check_in,
+			</if>
+			<if test="checkOut != null and checkOut != ''">
+				check_out,
+			</if>
+			<if test="arriveLate != null and arriveLate != ''">
+				arrive_late,
+			</if>
+			<if test="leaveEarly != null and leaveEarly != ''">
+				leave_early,
+			</if>
+			<if test="halfAbsenteeism != null and halfAbsenteeism != ''">
+				half_absenteeism,
+			</if>
+			<if test="absenteeism != null and absenteeism != ''">
+				absenteeism
+			</if>
+		</trim>
+		<trim prefix="values (" suffixOverrides="," suffix=")">
+			<if test="employeeSno != null and employeeSno != ''">
+				#{employeeSno},
+			</if>
+			<if test="employeeName != null and employeeName != ''">
+				#{employeeName},
+			</if>
+			<if test="presentDate != null and presentDate != ''">
+				#{presentDate},
+			</if>
+			<if test="checkIn != null and checkIn != ''">
+				#{checkIn},
+			</if>
+			<if test="checkOut != null and checkOut != ''">
+				#{checkOut},
+			</if>
+			<if test="arriveLate != null and arriveLate != ''">
+				#{arriveLate},
+			</if>
+			<if test="leaveEarly != null and leaveEarly != ''">
+				#{leaveEarly},
+			</if>
+			<if test="halfAbsenteeism != null and halfAbsenteeism != ''">
+				#{halfAbsenteeism},
+			</if>
+			<if test="absenteeism != null and absenteeism != ''">
+				#{absenteeism}
+			</if>
+		</trim>
+	</insert>
+	
+	<!-- 签退 -->
+	<update id="signOut" parameterType="EmpAttendance">
+		update emp_attendance
+		<set>
+			<if test="employeeSno != null and employeeSno != ''">
+				employee_sno =#{employeeSno},
+			</if>
+			<if test="employeeName != null and employeeName != ''">
+				employee_name =#{employeeName},
+			</if>
+			<if test="checkIn != null and checkIn != ''">
+				check_in =#{checkIn},
+			</if>
+			<if test="checkOut != null and checkOut != ''">
+				check_out =#{checkOut},
+			</if>
+			<if test="arriveLate != null and arriveLate != ''">
+				arrive_late =#{arriveLate},
+			</if>
+			<if test="leaveEarly != null and leaveEarly != ''">
+				leave_early =#{leaveEarly},
+			</if>
+			<if test="halfAbsenteeism != null and halfAbsenteeism != ''">
+				half_absenteeism =#{halfAbsenteeism},
+			</if>
+			<if test="absenteeism != null and absenteeism != ''">
+				absenteeism =#{absenteeism}
+			</if>
+		</set>
+		where present_date =#{presentDate}
+	</update>
+	
+	<!-- 判断今天签到了没有 -->
+	<select id="attendanceByDate" resultType="EmpAttendance" parameterType="String">
+		select * from emp_attendance where present_date =#{presentDate}
+	</select>
+	
+	<!-- 查询所有的员工考勤信息 -->
+	<select id="selectAttendance" resultType="EmpAttendance">
+		select * from emp_attendance
+	</select>
+</mapper>

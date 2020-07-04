@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.conference.mapper.LoginMapper">
+	<resultMap id="conferenceUsers" type="ConferenceUser">
+		<id column="USER_ID" jdbcType="VARCHAR" property="userId" />
+		<result column="USER_NAME" jdbcType="VARCHAR" property="userName" />
+		<result column="LOGIN_NAME" jdbcType="VARCHAR" property="loginName" />
+		<result column="LOGIN_PWD" jdbcType="VARCHAR" property="loginPwd" />
+		<result column="LAST_UPDATE_TIME" jdbcType="CHAR" property="lastUpdateTime" />
+		<result column="STATUS" jdbcType="CHAR" property="status" />
+		<result column="USER_TYPE" jdbcType="CHAR" property="userType" />
+		<result column="CAN_DELETE" jdbcType="CHAR" property="canDelete" />
+		<association property="role" javaType="ConferenceRole">
+			<result column="role_name"  property="roleName"/>
+		</association>
+	</resultMap>
+	
+	<resultMap id="conferenceEmployees" type="ConferenceEmployee">
+		<id column="employee_sno" jdbcType="VARCHAR" property="employeeSno" />
+		<result column="login_name" jdbcType="VARCHAR" property="loginName" />
+		<result column="login_pwd" jdbcType="VARCHAR" property="loginPwd" />
+		<result column="employee_name" jdbcType="CHAR" property="employeeName" />
+		<result column="employee_phone" jdbcType="CHAR" property="employeePhone" />
+		<result column="employee_static" jdbcType="CHAR" property="employeeStatic" />
+		<association property="role" javaType="ConferenceRole">
+			<result column="role_name"  property="roleName"/>
+		</association>
+	</resultMap>
+
+	<!-- 登录用户 -->
+	<select id="loginUser" resultMap="conferenceUsers"  parameterType="map">
+		select a.*,b.role_name from conference_user a,conference_role b,conference_role_user c where a.USER_ID=c.USER_ID and b.ROLE_ID=c.ROLE_ID and login_name =#{loginName} and login_pwd =#{loginPwd}
+	</select>
+	
+	<!-- 获取左侧菜单 -->
+	<select id="queryListMenu" resultType="ConferenceMenu" parameterType="String">
+		select a.* from conference_menu a,conference_role b,conference_user c,conference_role_user d,conference_role_menu e 
+		where e.menu_id=a.menu_id and e.role_id=b.role_id and d.user_id=c.user_id and d.role_id=b.role_id and c.user_id = #{userId}
+	</select>
+	
+	
+	<!-- 登录员工 -->
+	<select id="loginEmployee" resultMap="conferenceEmployees"  parameterType="map">
+		select a.*,b.role_name from conference_employee a,conference_role b,conference_role_employee c where a.employee_sno=c.employee_sno and b.role_id=c.role_id and login_name =#{loginName} and login_pwd =#{loginPwd}
+	</select>
+	
+	<!-- 获取左侧菜单 -->
+	<select id="findListMenu" resultType="ConferenceMenu" parameterType="String">
+		select a.* from conference_menu a,conference_role b,conference_employee c,conference_role_employee d,conference_role_menu e 
+		where e.menu_id=a.menu_id and e.role_id=b.role_id and d.employee_sno=c.employee_sno and d.role_id=b.role_id and c.employee_sno =#{employeeSno}
+	</select>
+</mapper>

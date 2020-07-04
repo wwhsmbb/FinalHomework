@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>会议登录页面</title>
+<link href="css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+<link href="css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+<link href="css/animate.min.css" rel="stylesheet">
+<link href="css/style.min.css?v=4.0.0" rel="stylesheet"><base>
+</head>
+  
+<body>
+<div class="middle-box text-center loginscreen  animated fadeInDown">
+        <div>
+            <div>
+
+                <h1 class="logo-name">H+</h1>
+
+            </div>
+            <h3>会议签到系统</h3>
+
+            <form class="m-t" role="form" id="loginForm" th:action="@{/login}" method="post">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="loginName" name="loginName" placeholder="用户名" required="required">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="loginPwd" name="loginPwd" placeholder="密码" required="required">
+                </div>
+                <button type="submit" onclick="javascript:login()" class="btn btn-primary block full-width m-b">登 录</button>
+            </form>
+        </div>
+    </div>
+<script src="js/jquery.min.js?v=2.1.4"></script>
+<script src="js/bootstrap.min.js?v=3.3.5"></script>
+<script src="js/plugins/comm/jquery.form.js"></script>
+<script type="text/javascript">
+function login(){
+	if(!$("#loginName").val()) {
+		_alert("请输入用户名");
+		return false;
+	}
+	
+	if(!$("#loginPwd").val()) {
+		_alert("请输入密码");
+		return false;
+	}
+}
+</script>
+</body>
+</html>

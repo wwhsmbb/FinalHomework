@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>员工管理</title>
+<meta name="keywords" content="员工管理">
+<meta name="description" content="员工管理">
+<base th:href="${#request.getContextPath()}+'/'">
+<link rel="shortcut icon" th:href="@{favicon.ico}" href="favicon.ico">
+
+<link rel="stylesheet" th:href="@{/res/css/login.css}"
+	href="/res/css/login.css" />
+<link th:href="@{/css/bootstrap.min.css?v=3.3.5}"
+	href="css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+<link th:href="@{/css/font-awesome.min.css?v=4.4.0}"
+	href="css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+<link th:href="@{/css/plugins/bootstrap-table/bootstrap-table.min.css}"
+	href="css/plugins/bootstrap-table/bootstrap-table.min.css"
+	rel="stylesheet">
+<link th:href="@{/css/animate.min.css}" href="css/animate.min.css"
+	rel="stylesheet">
+<link th:href="@{/css/style.min.css?v=4.0.0}"
+	href="css/style.min.css?v=4.0.0" rel="stylesheet">
+<link th:href="@{/css/plugins/sweetalert/sweetalert.css}"
+	href="/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+<link th:href="@{/css/plugins/bootstrap-select/bootstrap-select.min.css}"
+	href="/css/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<script type="text/javascript" th:src="@{/js/jquery-1.4.4.min.js}"></script>
+		<input type="hidden" id="ltdId" th:value="${LTD_ID}">
+		<input type="hidden" id="ltdName" th:value="${LTD_NAME}">
+		<div class="wrapper wrapper-content animated fadeInRight">
+		<div class="ibox float-e-margins">
+			<div class="ibox-content">
+				<div class="row row-lg">
+					<!-- 搜索列表框 -->
+					<div class="col-sm-12">
+						<!-- Example Pagination -->
+						<div class="example-wrap">
+							<h4 class="example-title">员工列表</h4>
+							<div class="example">
+								<div class="btn-group hidden-xs" id="toolbar" role="group">
+									<div class="pull-left" id="query-form" >
+										<input name="parameter"  type="text"style="float: left; width: 200px;height:30px; margin-right: 5px;"class="form-control" placeholder="名称/工号" />
+										<div class="btn-group">
+											<button id="btn_search" onclick="customSearch()"
+												type="button" class="btn btn-info">
+												<span class="fa fa-search" aria-hidden="true"></span>
+											</button>
+										</div>
+									</div>
+									<div class="pull-right" style="margin-left:2px;">
+										<button type="button" class="btn btn-success" onclick="showAdd()">
+											<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+										</button>
+										<button type="button" class="btn btn-danger" onclick="deleteAllEmployee()">
+											<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+										</button>
+									</div>
+								</div>
+								<table id="table_server"></table>
+							</div>
+						</div>
+						<div class="modal inmodal" id="add" tabindex="-1" role="dialog"
+						aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content animated bounceInRight">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">
+										<span aria-hidden="true">&times;</span><span class="sr-only">关闭</span>
+									</button>
+									<h4 class="modal-title">新增/修改用户</h4>
+								</div>
+								<div class="modal-body">
+									<div class="form-group">
+										<form id="mainfrm">
+											<label>工号</label> 
+											<input type="text" name="employeeSno" id="employeeSno" placeholder="请输入员工的工号" class="form-control">
+											<label>登陆账号</label> 
+											<input type="text" name="loginName" id="loginName" placeholder="请输入员工的登陆账号" class="form-control">
+											<label>登录密码</label> 
+											<input type="text" name="loginPwd" id="loginPwd" placeholder="请输入员工的登录密码" class="form-control">
+											<label>姓名</label> 
+											<input type="text" name="employeeName" id="employeeName" placeholder="请输入员工的姓名" class="form-control">
+											<label>姓名</label> 
+											<input type="text" name="employeePhone" id="employeePhone" placeholder="请输入员工的手机号" class="form-control">
+											<label>状态</label>
+			                                <select id ="employeeStatic" name="employeeStatic" class="form-control" data-live-search="true">
+													<option dispaly hidden selected data-tokens="ketchup mustard" value="">选择状态</option>
+													<option id = "zz" value="1">在职</option>
+													<option id = "lz" value="2">离职</option>
+											</select>
+										</form>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-white"
+										data-dismiss="modal">关闭</button>
+									<button type="button" class="btn btn-primary"
+										data-dismiss="modal" onclick="javascript:add()">保存</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					</div>
+		<!-- End Panel Other -->
+			</div>
+		</div>
+	</div>
+	</div>
+	<script src="/js/jquery.min.js?v=2.1.4"
+		th:src="@{/js/jquery.min.js?v=2.1.4}"></script>
+	<script src="/js/bootstrap.min.js?v=3.3.5"
+		th:src="@{/js/bootstrap.min.js?v=3.3.5}"></script>
+	<script src="/js/content.min.js?v=1.0.0"
+		th:src="@{/js/content.min.js?v=1.0.0}"></script>
+	<script src="/js/plugins/bootstrap-table/bootstrap-table.min.js"
+		th:src="@{/js/plugins/bootstrap-table/bootstrap-table.min.js}"></script>
+	<script src="/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"
+		th:src="@{/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js}"></script>
+	<script
+		src="/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"
+		th:src="@{/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js}"></script>
+	<script src="/js/app.js" th:src="@{/js/app.js}"></script>
+	<script src="/js/plugins/sweetalert/sweetalert.min.js"
+		th:src="@{/js/plugins/sweetalert/sweetalert.min.js}"></script>
+	<script src="/js/baisee/data.delete.js" th:src="@{/js/baisee/data.delete.js}"></script>
+	<script src="/js/plugins/bootstrap-select/bootstrap-select.min.js" th:src="@{/js/plugins/bootstrap-select/bootstrap-select.min.js}"></script>
+	
+	<script th:inline="javascript">
+	$(function() {
+		var timestamp = Date.parse(new Date());
+		var t = $("#table_server").bootstrapTable({
+			url : 'employee/page',
+			dataField : 'list',
+			method : 'POST',
+			contentType : "application/x-www-form-urlencoded",
+			dataType : "json",
+			striped : true,//设置为 true 会有隔行变色效果
+			undefinedText : "空",//当数据为 undefined 时显示的字符
+			pagination : true, //分页
+			// paginationLoop:true,//设置为 true 启用分页条无限循环的功能。
+			showToggle : "true",//是否显示 切换试图（table/card）按钮
+			showColumns : "true",//是否显示 内容列下拉框
+			pageNumber : 1,//如果设置了分页，首页页码
+			// showPaginationSwitch:true,//是否显示 数据条数选择框
+			pageSize : 5,//如果设置了分页，页面数据条数
+			pageList : [ 5, 10, 20, 40 ], //如果设置了分页，设置可供选择的页面数据条数。设置为All 则显示所有记录。
+			paginationPreText : '‹',//指定分页条中上一页按钮的图标或文字,这里是<
+    		paginationNextText: '›',//指定分页条中下一页按钮的图标或文字,这里是>
+			// singleSelect: false,//设置True 将禁止多选
+			search : false, //显示搜索框
+			toolbar : "#toolbar",//工具栏
+			data_local : "zh-US",//表格汉化
+			sidePagination : "server", //服务端处理分页
+			queryParams : function(params) {//自定义参数，这里的参数是传给后台的，我这是是分页用的
+				var param = {};
+				$('#query-form').find('[name]').each(function() {
+					var value = $(this).val();
+					if (value != '') {
+						param[$(this).attr('name')] = value;
+					}
+				});
+			    param['pageNum'] = this.pageNumber;  
+				param['pageSize'] = this.pageSize;   //页面大小
+			    param['limit'] = this.limit; 
+			    param['offset'] = this.offset; 
+				//页码
+				return param;
+			},
+			idField : "employeeSno",//指定主键列
+			columns : [ {
+				checkbox : "true",
+				field : "box"
+			}, {
+				title : '工号',
+				field : 'employeeSno',
+				align : 'center'
+			}, {
+				title : '姓名',
+				field : 'employeeName',
+				align : 'center'
+			},{
+				title : '手机号',
+				field : 'employeePhone',
+				align : 'center'
+			},{
+				title : '状态',
+				field : 'employeeStatic',
+				align : 'center',
+				
+			},{
+				field : 'oprate',
+				title : '操作',
+				width : 200,
+				align : 'center',
+				valign : 'middle',
+				formatter : function(value, row,
+						index) {
+					return [ "<a href='javascript:update(" +JSON.stringify(row)+ ")'>编辑</a>"].join("")
+				}
+			}
+			]
+		});
+	});
+	
+	/**打开新建框*/
+	function showAdd() {
+		$("#mainfrm")[0].reset();
+		$("#add").modal('show');
+		$("#zz").prop("selected", false);
+		$("#lz").prop("selected", false);
+	}
+	/**保存*/
+	function add() {
+		/* var data = App.form2json("#mainfrm"); */
+		$.post('employee/add', $("#mainfrm").serialize(), function(resp) {
+			$("#table_server").bootstrapTable("refresh");
+		}) 
+	}	
+	
+	function update(employee) {
+		$("#zz").prop("selected", false);
+		$("#lz").prop("selected", false);
+		$("#employeeSno").val(employee.employeeSno);
+		$("#loginName").val(employee.loginName);
+		$("#loginPwd").val(employee.loginPwd);
+		$("#employeeName").val(employee.employeeName);
+		$("#employeePhone").val(employee.employeePhone);
+		if(employee.employeeStatic=='在职'){
+			$("#zz").prop("selected", true);
+			$("#zz").attr("selected","selected");
+		}else if(employee.employeeStatic=='离职'){
+			$("#lz").prop("selected", true);
+			$("#lz").attr("selected","selected");
+		}
+		$("#add").modal('show');
+	}
+	
+	function deleteAllEmployee(){
+		var rows = $("#table_server").bootstrapTable("getSelections");
+		var employeeSno = [];
+		var len = rows.length;
+		for (var i = 0; i < len; i++) {
+			employeeSno.push(rows[i].employeeSno);
+		}
+		if(employeeSno.length==0){
+			swal("提示","请选择要删除的员工", "warning");
+			return false;
+		}
+		
+		$.ajax({
+			url : "employee/delete",
+			dataType : "json",
+			traditional : true,//属性在这里设置
+			method : "post",
+			data : {
+				"employeeSno" : employeeSno
+			},
+			success : function(data) {
+				swal(data.result, data.msg, data.hint);
+				$("#table_server").bootstrapTable("refresh");
+			},
+			error : function() {
+				swal("删除失败！", "请重试。", "error");
+			}
+		});
+	}
+function customSearch(text) {
+	 $("#table_server").bootstrapTable('refresh');//刷新Table，Bootstrap Table 会自动执行重新查询
+}
+	</script>
+</body>
+</html>
